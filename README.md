@@ -3,7 +3,7 @@
 ## Description
 
 1.	It is a custom action that takes an XML based template file as input and generates formatted output file as dictated by the template
-2.	Refer to the documentation folder for sample templates and for template documentation - Release/DataCapSmartExport_v1.0.docx
+2.	Refer to the documentation folder for sample templates and for template documentation
 
 
 ## Build and deploy (for developers)

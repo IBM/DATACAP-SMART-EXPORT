@@ -75,8 +75,7 @@ namespace SmartExportTemplates.Utils
                     //names output file with thevalue sepcified in filename tag or use the default name
                         prefix = templateParser.GetOutputFileName();
                     outputFileName = prefix
-                                            + "_"
-                                            + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-fffffff") + '.'
+                                            + '.'
                                             + templateParser.GetOutputFileExt();
                     outputFilePath = Path.Combine(templateParser.GetOutputDirectory(),
                                             outputFileName);

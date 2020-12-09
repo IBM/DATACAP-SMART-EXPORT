@@ -55,6 +55,14 @@ namespace SmartExportTemplates.TemplateCore
                         case Constants.SE_NEW_LINE_NODE_NAME:
                             text.Append(Constants.NEW_LINE);
                             break;
+                        case Constants.SE_COMMA_LOOP_NODE_NAME:
+                            ExportCore.WriteDebugLog("Global Row count before row printing" + (int)Globals.Instance.GetData(Constants.ROW_COUNT));
+                            int rowCount = (int)Globals.Instance.GetData(Constants.ROW_COUNT);
+                            if (rowCount > 1)
+                            {
+                                text.Append(Constants.COMMA);
+                            }
+                            break;
                         case Constants.SE_COMMA_NODE_NAME:
                             text.Append(Constants.COMMA);
                             break;

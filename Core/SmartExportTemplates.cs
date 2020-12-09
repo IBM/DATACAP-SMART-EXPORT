@@ -271,6 +271,7 @@ namespace SmartExportTemplates
             Globals.Instance.SetData(Constants.CSV_HEADERS, "");
             Globals.Instance.SetData(Constants.forLoopString.CURRENTITERATIONDCO, Constants.EMPTYSTRING);
             Globals.Instance.SetData(Constants.GE_SMART_NAV, smartNav);
+            Globals.Instance.SetData(Constants.ROW_COUNT, 0);
         }
 
        
@@ -283,9 +284,17 @@ namespace SmartExportTemplates
                 Stopwatch sw = Stopwatch.StartNew();
                 smartNav = new dcSmart.SmartNav(this);
 
+                if(TemplateFilePath.StartsWith(Constants.SMART_PARAM_APP_PREFIX))
+                {
+                    WriteDebugLog("Template file path is specified as a smart param " + TemplateFilePath);
+                    TemplateFilePath = smartNav.MetaWord(TemplateFilePath);
+                    WriteDebugLog("Template file path smart parameter evalauted to be  " + TemplateFilePath);
+                }
+                WriteDebugLog("Template file path is " + TemplateFilePath);
+
                 //set thread locals
                 SetGlobals();
-                //TODO: Validate template
+
                 //Initialize the parser
                 TemplateParser templateParser = new TemplateParser(TemplateFilePath);
                 templateParser.Parse();
@@ -320,10 +329,10 @@ namespace SmartExportTemplates
                 //or when project doesn't have document and action is attached at page/field level
                 //or when collate batch output flag is true when action is attached at batch level and project doesn't have 
                 //document
-                if (projectHasDocument
+                if ((projectHasDocument && CurrentDCO.ObjectType() != Constants.Batch)
+                    || (projectHasDocument && CurrentDCO.ObjectType() == Constants.Batch && templateParser.CollateBatchOutput())
                     || (CurrentDCO.ObjectType() != Constants.Batch && !projectHasDocument)
-                    || (CurrentDCO.ObjectType() == Constants.Batch && !projectHasDocument
-                        && templateParser.CollateBatchOutput()))
+                    || (CurrentDCO.ObjectType() == Constants.Batch && !projectHasDocument && templateParser.CollateBatchOutput()))
                     exportUtil.writeToFile(singleOutputFileNameMap);
 
                 WriteInfoLog(" Smart export WriteLog completed in " + sw.ElapsedMilliseconds+" ms.");

@@ -47,7 +47,7 @@ namespace SmartExportTemplates.Utils
             internal const string CURRENTFILE = "currentFile";
         }
 
-        //Templat element names
+        //Template element names
         public static string SE_NAMESPACE_URL = "https://www.w3.org/2001/XMLSchema";
         public static string SE_NAMESPACE_NAME = "se";
         public static string SE_DATA_NODE_NAME = "se:data";
@@ -61,8 +61,12 @@ namespace SmartExportTemplates.Utils
         public static string SE_BATCH_OUTPUT = "se:BatchOutput";
         public const string SE_COLLATE = "se:collate";
         public const string SE_NAME_AFTER_INPUT = "se:nameafterinput";
+        public const string SE_COMMA_LOOP_NODE_NAME = "se:commaLoop";
 
         //General
+        public static string SMART_PARAM_APP_PREFIX = "@APP";
+        public const string EMPTY_STRING_VALUE = "EMPTY_STRING";
+        public static string ROW_COUNT = "RowCount";
         public static string GE_TEMPLATE_PARSER = "GETemplateParser";
         public static string GE_CURRENT_DCO = "GECurrentDCO";
         public const string GE_SMART_NAV = "GESmartNav";
@@ -81,11 +85,13 @@ namespace SmartExportTemplates.Utils
         public const string GE_DEFAULT_OUTPUT_MEMORY_CACHE_LINES = "3000";
         public static string DCO_REF_PATTERN = "\\[DCO\\]\\.\\[.+?\\]\\.\\[.+?\\]\\.\\[.+?\\]";
         public static string DCO_REF_PATTERN_NO_DOC = "\\[DCO\\]\\.\\[.+?\\]\\.\\[.+?\\]";
+        public static string DCO_REF_PATTERN_TABLE = "\\[DCO\\]\\.\\[.+?\\]\\.\\[.+?\\]\\.\\[.+?\\]\\.\\[.+?\\]";
+        public static string DCO_REF_PATTERN_NO_DOC_TABLE = "\\[DCO\\]\\.\\[.+?\\]\\.\\[.+?\\]\\.\\[.+?\\]";
         public static string IF_REF_PATTERN = "(and|or)";
-        public static string ALLOWED_OPERATORS = "(EQUALS|LESSER-THAN|GREATER-THAN|CONTAINS)";
+        public static string ALLOWED_OPERATORS = "(EQUALS|LESSER-THAN|GREATER-THAN|CONTAINS|NOT-EQUALS)";
         public static string LOCALE = "locale";
-        internal const string EMPTYSTRING = "";
-        internal const string COMMA = ",";
+        public const string EMPTYSTRING = "";
+        public const string COMMA = ",";
         public static string FILE_PAGE_MAP = "FilePageMap";
         public static string PROJECT_HAS_DOC="projectHasDoc";
         public static string CSV_HEADERS="CSVHeaders";
@@ -128,6 +134,7 @@ namespace SmartExportTemplates.Utils
             internal const string LESSER_THAN = "LESSER-THAN";
             internal const string GREATER_THAN = "GREATER-THAN";
             internal const string CONTAINS = "CONTAINS";
+            internal const string NOT_EQUALS = "NOT-EQUALS";
         }
 
     }

@@ -200,6 +200,7 @@ namespace SmartExportTemplates.DCOUtil
                         IDCO field = page.GetChild(i);
                         if (isObjectTable(field) && (field.ID == tableName))
                         {
+                            ExportCore.WriteDebugLog("Found table " + tableName + "in document " + document.Type);
                             tables.Add(field);
                             break;
                         }
@@ -715,7 +716,38 @@ namespace SmartExportTemplates.DCOUtil
         ///       </summary>
         public virtual string getPageTypesInFile()
         {
-            throw new SmartExportException("Operation not supported for projects with Document.");
+            Stopwatch sw = Stopwatch.StartNew();
+            List<string> pageTypes = new List<string>();
+            TDCOLib.IDCO currentIterationDCO = (TDCOLib.IDCO)Globals.Instance.GetData(Constants.forLoopString.CURRENTITERATIONDCO);
+
+            if (CurrentDCO.ObjectType() != Constants.Batch)
+            {
+                throw new SmartExportException("All Page Types In Document can be determined at batch level only.");
+            }
+
+            else if (currentIterationDCO.ObjectType() != Constants.Document)
+            {
+                throw new SmartExportException(" Page Types   can be determined for  a document only.");
+
+            }
+            else
+            {
+                ExportCore.WriteDebugLog("Number of pages in the document -"+ currentIterationDCO.NumOfChildren());
+                ExportCore.WriteDebugLog("Pages types found in document are listed below-");
+                for (int i = 0; i < currentIterationDCO.NumOfChildren(); i++)
+                {
+                    TDCOLib.IDCO pageDCO = currentIterationDCO.GetChild(i);
+                    if (pageDCO.ObjectType() == Constants.Page)
+                    {
+                        pageTypes.Add(pageDCO.Type);
+                        ExportCore.WriteDebugLog(pageDCO.Type);
+                    }
+                }
+            } 
+            ExportCore.WriteDebugLog(" getPageTypesInFile() completed in " + sw.ElapsedMilliseconds + " ms.");
+            sw.Stop();
+
+            return string.Join(",", pageTypes);
         }
     }
 }

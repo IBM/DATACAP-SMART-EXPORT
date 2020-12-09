@@ -71,11 +71,23 @@ namespace SmartExportTemplates.Utils
         public static bool evaluateStringExpression(string operandOne, string operandTwo, string op)
         {
             bool response = false;
-
+            operandOne = operandOne.Trim();
+            operandTwo = operandTwo.Trim();
+            if (operandOne.Equals(Constants.EMPTY_STRING_VALUE))
+            {
+                operandOne = Constants.EMPTYSTRING;
+            }
+            else if (operandTwo.Equals(Constants.EMPTY_STRING_VALUE))
+            {
+                operandTwo = Constants.EMPTYSTRING;
+            }
             switch (op)
             {
                 case Constants.Operators.EQUALS:
                      response = operandOne.Equals(operandTwo, StringComparison.OrdinalIgnoreCase);
+                    break;
+                case Constants.Operators.NOT_EQUALS:
+                    response = !operandOne.Equals(operandTwo, StringComparison.OrdinalIgnoreCase);
                     break;
                 case Constants.Operators.CONTAINS:
                     response = operandOne.Split(',').Contains(operandTwo);
