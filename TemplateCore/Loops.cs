@@ -14,6 +14,7 @@ namespace SmartExportTemplates.TemplateCore
         protected TDCOLib.IDCO CurrentDCO = (TDCOLib.IDCO)Globals.Instance.GetData(Constants.GE_CURRENT_DCO);
         SmartExportTemplates.SmartExport ExportCore = (SmartExportTemplates.SmartExport)Globals.Instance.GetData(Constants.GE_EXPORT_CORE);
         private int nestingLevel = 0;
+        private bool isOuter = false;
         public Loops()
         {
 
@@ -57,14 +58,22 @@ namespace SmartExportTemplates.TemplateCore
             {
                 int forEachlevel = getIntValueForEachObjectType(loopNode.Attributes["select"].Value);
                 nestingLevel = setAndValidateNestingLevel(loopNode);
-                validateForLoop(forEachlevel, DCO);
-
+                if(nestingLevel==0)
+                    validateForLoop(forEachlevel, DCO);
+                if (isOuter)
+                    ExportCore.WriteLog("In outer loop at level " + loopNode.Attributes["select"].Value);
+                TemplateParser templateParser = (TemplateParser)Globals.Instance.GetData(Constants.GE_TEMPLATE_PARSER);
+                bool isDocLoopAndSeparateOutput =
+                    (isOuter && CurrentDCO.ObjectType() == Constants.Batch && !templateParser.CollateBatchOutput());
                 for (int i = 0; i < DCO.NumOfChildren(); i++)
                 {
-
+                    TDCOLib.IDCO currentIterationDCO = DCO.GetChild(i);
                     //setting the currentIterationDCO , so that it can be used in DCODataRetreiver to get the data.
                     Globals.Instance.SetData(Constants.forLoopString.CURRENTITERATIONDCO, DCO.GetChild(i));
-
+                    if (isDocLoopAndSeparateOutput)
+                    {
+                        Globals.Instance.SetData(Constants.ROW_COUNT, 0);
+                    }
                     foreach (XmlNode node in loopNode.ChildNodes)
                     {
                         switch (node.Name)
@@ -83,10 +92,9 @@ namespace SmartExportTemplates.TemplateCore
                                     new SmartExportException("Its mandatory to specify the table name when the for-each-rows tag " +
                                         "is used within se:for-each tag for tables.");
                                 }
-                                if (node.Attributes["tablename"].Value == DCO.GetChild(i).ID)
-                                {
+       
                                     table.FetchTable(node);
-                                }                                
+                                
                                 break;
                             case Constants.NodeTypeString.SE_DATA:
                                 dataElement.EvaluateData(node);
@@ -99,8 +107,30 @@ namespace SmartExportTemplates.TemplateCore
                                 break;
                         }
                     }
+                    
+                    if (currentIterationDCO.ObjectType() == Constants.Document)
+                    {
+                        ExportCore.WriteLog("Getting the image name");
+                        TDCOLib.IDCO temp = CurrentDCO;
+                        dcSmart.SmartNav SmartNav = (dcSmart.SmartNav)Globals.Instance.GetData(Constants.GE_SMART_NAV);
+                        SmartNav.SetRRCurrentDCO(currentIterationDCO);
+                        string imageName = SmartNav.MetaWord(Constants.SMARTP_AT + "D.SourceFileName");
+                        Globals.Instance.SetData(Constants.forLoopString.CURRENTFILE, imageName);
+
+                        ExportCore.WriteLog("image name is "+imageName);
+                        SmartNav.SetRRCurrentDCO(temp);
+                        if (isDocLoopAndSeparateOutput)
+                        {
+                            ExportCore.WriteLog("Generating output file");
+
+                            ExportCore.getExportUtil.writeToFile(null);
+
+                        }
+                    }
+                    
                     //setting it to empty after every iteration.
                     Globals.Instance.SetData(Constants.forLoopString.CURRENTITERATIONDCO, Constants.EMPTYSTRING);
+                    
                 }
             }
             catch (System.Exception exp)
@@ -158,6 +188,10 @@ namespace SmartExportTemplates.TemplateCore
             return nestingLevel;
         }
 
+        public void setIsOuterLoop(bool isOuter)
+        {
+            this.isOuter = isOuter;
+        }
 
         ///       <summary>
         ///       The method returns integer value of the object type passed.

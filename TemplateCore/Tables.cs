@@ -22,6 +22,7 @@ namespace SmartExportTemplates.TemplateCore
         int rowEnd = 0;
         TDCOLib.IDCO DCO = null;
         List<TDCOLib.IDCO> tableDCOs = new List<TDCOLib.IDCO>();
+        XmlNode conditionNode = null;
 
         public Tables()
         {          
@@ -38,6 +39,13 @@ namespace SmartExportTemplates.TemplateCore
            
             setContext();
 
+            XmlNode node = tableNode.ChildNodes.Item(0);
+
+            if (node.Name == Constants.NodeTypeString.SE_IF)
+            {
+                conditionNode = node;
+            }
+
             if (DCO.ObjectType() == Constants.Field)
             {
                 initializeTableObjectForField(tableNode);
@@ -48,6 +56,7 @@ namespace SmartExportTemplates.TemplateCore
             }
             else if(DCO.ObjectType()==Constants.Document)
             {
+                ExportCore.WriteDebugLog("Looking for table at document level!");
                 initializeTableObjectForDocument(tableNode);                
             }
             else if (DCO.ObjectType() == Constants.Batch && !projectHasDoc)
@@ -182,23 +191,49 @@ namespace SmartExportTemplates.TemplateCore
             // iterate over rows
             // print rows
             int i = rowStart;
+            int rowCount = (int)Globals.Instance.GetData(Constants.ROW_COUNT);
+            ConditionEvaluation conditionEvaluator = null;
             do
             {
                 TDCOLib.DCO row = table.GetChild(i);
+                XmlNode dataNode = null;
                 if (row.ObjectType() == Constants.Field)
                 {
-                    i++;
+
                     Globals.Instance.SetData(Constants.forLoopString.CURRENTITERATIONDCO, row);
-                    XmlNode dataNode = tableNode.ChildNodes.Item(0);
+
+                    if (null != conditionNode )
                     {
-                        if (dataNode.Name == Constants.NodeTypeString.SE_DATA)
-                        {
-                            dataElement.setIsTableColumn(true);
-                            dataElement.EvaluateData(dataNode);
-                        }
+                        string CondText = ((XmlElement)conditionNode).GetAttribute(Constants.SE_ATTRIBUTE_COND_TEST);
+                        conditionEvaluator = new ConditionEvaluation(CondText);
+                        conditionEvaluator.setIsColumnCondition(true);
+                        dataNode = conditionNode.ChildNodes.Item(0);
+
                     }
+                    else 
+                    {
+                        dataNode = tableNode.ChildNodes.Item(0);
+                    }
+                    i++;
+
+                    if(null == conditionNode || conditionEvaluator.CanEvaluate())
+                    {
+                        Globals.Instance.SetData(Constants.ROW_COUNT, ++rowCount);
+
+                          
+                        
+                            if (dataNode.Name == Constants.NodeTypeString.SE_DATA)
+                            {
+                                dataElement.setIsTableColumn(true);
+                                dataElement.EvaluateData(dataNode);
+                            }
+                        
+
+                        Globals.Instance.SetData(Constants.forLoopString.CURRENTITERATIONDCO, Constants.EMPTYSTRING);
+
+                    }
+
                 }
-                Globals.Instance.SetData(Constants.forLoopString.CURRENTITERATIONDCO, Constants.EMPTYSTRING);
             } while (i < rowEnd);
         }
 

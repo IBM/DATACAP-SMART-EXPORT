@@ -17,6 +17,12 @@ namespace SmartExportTemplates.TemplateCore
         SmartExportTemplates.SmartExport ExportCore = (SmartExportTemplates.SmartExport)Globals.Instance.GetData(Constants.GE_EXPORT_CORE);
         bool projectHasDoc = (bool)Globals.Instance.GetData(Constants.PROJECT_HAS_DOC);
         string pattern;
+        bool isColumnCondition = false;
+
+        public void setIsColumnCondition(bool isColumnCondition)
+        {
+            this.isColumnCondition = isColumnCondition;
+        }
 
         public ConditionEvaluation(string ConditionText)
         {
@@ -28,12 +34,19 @@ namespace SmartExportTemplates.TemplateCore
             if (projectHasDoc)
             {
                 dCODataRetriever = new DCODataRetriever();
-                pattern = Constants.DCO_REF_PATTERN;
+                if(isColumnCondition)
+                    pattern = Constants.DCO_REF_PATTERN_TABLE;
+                else
+                    pattern = Constants.DCO_REF_PATTERN;
+
             }
             else
             {
                 dCODataRetriever = new DCODataRetrieverWithoutDoc();
-                pattern = Constants.DCO_REF_PATTERN_NO_DOC;
+                if (isColumnCondition)
+                    pattern = Constants.DCO_REF_PATTERN_NO_DOC_TABLE;
+                else
+                    pattern = Constants.DCO_REF_PATTERN_NO_DOC;
             }
             //Parse Conditions
             ParseConditions();
@@ -106,12 +119,26 @@ namespace SmartExportTemplates.TemplateCore
                 if (rx.IsMatch(operands[i].Trim()))
                 {
                     string expr = operands[i];
-                    operands[i] = dCODataRetriever.getDCOValue(operands[i].Trim());
-                    if ("" == operands[i])
+                    if (isColumnCondition)
                     {
-                        ExportCore.WriteLog("Could not find value for  " + expr + " in " + conditionText);
-                        return false;
+                        string[] words = operands[i].Trim().Split('.');
+                        operands[i] = dCODataRetriever.getColumnValueForRow(words[4].Replace("[", "").Replace("]", ""));
+                        if ("" == operands[i])
+                        {
+                            ExportCore.WriteLog("Could not find value for  " + expr + " in " + conditionText);
+                            return false;
+                        }
                     }
+                    else
+                    { 
+                        operands[i] = dCODataRetriever.getDCOValue(operands[i].Trim());
+                        if ("" == operands[i])
+                        {
+                            ExportCore.WriteLog("Could not find value for  " + expr + " in " + conditionText);
+                            return false;
+                        }
+                    }
+                    
                 }
                 else if(Constants.ConditionString.DOCUMENT_TYPE == operands[i].Trim())
                 {
@@ -146,10 +173,15 @@ namespace SmartExportTemplates.TemplateCore
             {
                 operandTwoType = operandOneType = castNumericDataTypes(operandOneType, operandTwoType);
             }
-            if (operandOneType != operandTwoType)
+            
+            if(operandOneType != operandTwoType  )
             {
-                throw new SmartExportException("Invalid comparisons in : "
-                    + conditionText + " " + operandOneType + " " + operands[1] + " " + operandTwoType);
+                if(operands[1].Trim() == Constants.Operators.NOT_EQUALS
+                    && (operands[0].Trim() == Constants.EMPTY_STRING_VALUE || operands[2].Trim() == Constants.EMPTY_STRING_VALUE))                  
+                    operandOneType = Constants.DataTypeString.STRING;
+                else
+                    throw new SmartExportException("Invalid comparisons in : "
+                   + conditionText + " " + operandOneType + " " + operands[1] + " " + operandTwoType);
             }
             try
             {

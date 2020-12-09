@@ -1,0 +1,68 @@
+<se:smartexport version="1.0" xmlns:se="https://www.w3.org/2001/XMLSchema">
+  <se:appendToFile>false</se:appendToFile>
+  <se:locale>en-US</se:locale>
+  <se:locale>es-ES</se:locale> : spanish
+
+  <se:BatchOutput>
+    <se:collate>False</se:collate>
+    <se:nameafterinput>True</se:nameafterinput>
+  </se:BatchOutput>
+  <se:fileext>json</se:fileext>
+
+
+  <se:for-each select="document">
+
+    <se:if test="file.page.types CONTAINS Invoice">
+
+          <se:data>{</se:data>
+		   <se:data><se:tab/>"scanId": "<se:value select="[DCO].[Document].[Invoice].[Scan ID]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"companyCode": "<se:value select="[DCO].[Document].[Invoice].[Company Code]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"documentType": "<se:value select="[DCO].[Document].[Invoice].[Document type]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"scanDate": "<se:value select="[DCO].[Document].[Invoice].[Scan Date]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"scanType": "<se:value select="[DCO].[Document].[Invoice].[Scan Type]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"documentNumber": "<se:value select="[DCO].[Document].[Invoice].[Document Number]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"documentDate": "<se:value select="[DCO].[Document].[Invoice].[Document Date]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"currency": "<se:value select="[DCO].[Document].[Invoice].[currency]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"poNumber": "<se:value select="[DCO].[Document].[Invoice].[PO Number]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"vendorName": "<se:value select="[DCO].[Document].[Invoice].[Vendor Name]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"vendorAddress": "<se:value select="[DCO].[Document].[Invoice].[Vendor Address]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"vendorVatRegistrationNumber": "<se:value select="[DCO].[Document].[Invoice].[Vendor VAT Registration Number]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"bankAccount": "<se:value select="[DCO].[Document].[Invoice].[Vendor Bank Account Number]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"bankIban": "<se:value select="[DCO].[Document].[Invoice].[Vendor IBAN]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"companyVatRegistrationNumber": "<se:value select="[DCO].[Document].[Invoice].[Company VAT Registration Number]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"billToName": "<se:value select="[DCO].[Document].[Invoice].[Bill to Name]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"billToAddress": "<se:value select="[DCO].[Document].[Invoice].[Bill to Address]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"providerType": "<se:value select="[DCO].[Document].[Invoice].[Provider Type]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"totalAmount": <se:value select="[DCO].[Document].[Invoice].[Invoice Total]"/><se:comma/></se:data>
+		   <se:data><se:tab/>"netAmount": <se:value select="[DCO].[Document].[Invoice].[Invoice Net Amount]"/><se:comma/></se:data>
+		   <se:data><se:tab/>"taxAmount": <se:value select="[DCO].[Document].[Invoice].[Invoice Tax Amount]"/><se:comma/></se:data>
+		   <se:data><se:tab/>"dueDate": "<se:value select="[DCO].[Document].[Invoice].[Invoice Due Date]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"shipToAddress": "<se:value select="[DCO].[Document].[Invoice].[Ship to Address]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"description": "<se:value select="[DCO].[Document].[Invoice].[Header Description]"/>"<se:comma/></se:data>
+		   <se:data><se:tab/>"paymentReference": "<se:value select="[DCO].[Document].[Invoice].[Payment Reference]"/>"<se:comma/></se:data>
+
+		<se:data><se:tab/>"lines" :[ </se:data>
+
+			 <se:for-each-rows fromrow=""  torow="" tablename="InvoiceTable">
+	<se:if test="[DCO].[Document].[Invoice].[InvoiceTable].[LineItemDescription] NOT-EQUALS EMPTY_STRING">
+         <se:data><se:commaLoop/>
+ 				{<se:newLine/>
+				<se:tab/><se:tab/>"quantity":  <se:value select="LineQuantity"/><se:comma/><se:newLine/>
+				<se:tab/><se:tab/>"netAmount": <se:value select="LineNetAmount"/><se:comma/><se:newLine/>
+				<se:tab/><se:tab/>"taxAmount": <se:value select="LineTaxAmount"/><se:comma/><se:newLine/>
+				<se:tab/><se:tab/>"totalAmount": <se:value select="LineGrossAmount"/><se:comma/><se:newLine/>
+				<se:tab/><se:tab/>"unitPrice":  <se:value select="UnitPrice"/><se:comma/><se:newLine/>
+				<se:tab/><se:tab/>"materialNumber": " <se:value select="MaterialNumber"/> "<se:comma/><se:newLine/>
+				<se:tab/><se:tab/>"unitOfMeasure": " <se:value select="UoM"/> "<se:comma/><se:newLine/>
+				<se:tab/><se:tab/>"deliveryNote": " <se:value select="DeliveryNote"/> "<se:comma/><se:newLine/>
+				<se:tab/><se:tab/>"description": " <se:value select="LineItemDescription"/> "<se:newLine/>
+				}</se:data>
+		</se:if>
+			</se:for-each-rows>
+
+			<se:data>]</se:data>
+          <se:data>}</se:data>
+
+</se:if>		
+</se:for-each>
+</se:smartexport>

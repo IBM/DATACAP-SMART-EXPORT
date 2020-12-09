@@ -91,6 +91,7 @@ namespace SmartExportTemplates.Core
                         conditionEvaluator.EvaluateCondition(currentNode);
                         break;
                     case NodeType.ForEach:
+                        loopEvaluator.setIsOuterLoop(true);
                         loopEvaluator.EvaluateLoop(currentNode);
                         break;
                     case NodeType.ForEachRows:
