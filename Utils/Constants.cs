@@ -87,7 +87,7 @@ namespace SmartExportTemplates.Utils
         public static string DCO_REF_PATTERN_NO_DOC = "\\[DCO\\]\\.\\[.+?\\]\\.\\[.+?\\]";
         public static string DCO_REF_PATTERN_TABLE = "\\[DCO\\]\\.\\[.+?\\]\\.\\[.+?\\]\\.\\[.+?\\]\\.\\[.+?\\]";
         public static string DCO_REF_PATTERN_NO_DOC_TABLE = "\\[DCO\\]\\.\\[.+?\\]\\.\\[.+?\\]\\.\\[.+?\\]";
-        public static string IF_REF_PATTERN = "(and|or)";
+        public static string IF_REF_PATTERN = "( and | or )";
         public static string ALLOWED_OPERATORS = "(EQUALS|LESSER-THAN|GREATER-THAN|CONTAINS|NOT-EQUALS)";
         public static string LOCALE = "locale";
         public const string EMPTYSTRING = "";
